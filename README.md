@@ -9,5 +9,5 @@
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/ariansarathy/netport-scanner.git
-   cd netport-scanner
+   git clone https://github.com/ariansarathy/NetPort-Scanner.git
+   cd NetPort-Scanner
