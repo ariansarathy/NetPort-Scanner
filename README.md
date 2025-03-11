@@ -1,7 +1,7 @@
 # NetPort Scanner
 
 ## Background
-In today’ digital world, cyberattacks are increasingly targeting unguarded network services through open TCP ports. Network administrators and security experts need robust tools to detect and address these vulnerabilities before they can be exploited. Inspired by the growing necessity for a faster and more reliable port-scanning solution, we created NetPort Scanner.
+In today’s digital world, cyberattacks are increasingly targeting unguarded network services through open TCP ports. Network administrators and security experts need robust tools to detect and address these vulnerabilities before they can be exploited. Inspired by the growing necessity for a faster and more reliable port-scanning solution, we created NetPort Scanner.
 
 ## Project Overview
 NetPort Scanner is a Python-based utility designed to scan for open TCP ports on a specific IP address. It aids network administrators and cybersecurity teams by detecting open ports that could expose critical services to security threats. With enhanced scanning algorithms, my tool is highly accurate in identifying services that could lead to potential breaches.
