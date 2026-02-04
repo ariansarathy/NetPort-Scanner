@@ -14,5 +14,4 @@ venv/
 # Other files you don't need in the repository
 *.log
 
-pip.inl
-
+pip.inl #testing delete if application doesn't run
