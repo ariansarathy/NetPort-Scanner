@@ -13,3 +13,6 @@ venv/
 
 # Other files you don't need in the repository
 *.log
+
+pip.inl
+
