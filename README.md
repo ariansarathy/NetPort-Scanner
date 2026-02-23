@@ -1,21 +1,92 @@
-# NetPort Scanner
+# 🔍 NetPort Scanner
 
-## Background
-In today’s digital world, cyberattacks are increasingly targeting unguarded network services through open TCP ports. Network administrators and security experts need robust tools to detect and address these vulnerabilities before they can be exploited. Inspired by the growing necessity for a faster and more reliable port-scanning solution, we created NetPort Scanner.
+A Python-based TCP port scanner with multi-threaded scanning, detailed security reporting, and an optional Flask web interface.
 
-## Project Overview
-NetPort Scanner is a Python-based utility designed to scan for open TCP ports on a specific IP address. It aids network administrators and cybersecurity teams by detecting open ports that could expose critical services to security threats. With enhanced scanning algorithms, my tool is highly accurate in identifying services that could lead to potential breaches.
+---
 
-## Key Features
-- Optimized Multi-threaded Scanning: My tool uses advanced multi-threading techniques to parallelize the scan process, speeding up detection while maintaining accuracy.
-- Detailed Reporting: Generates a comprehensive report highlighting open ports, service details, and security recommendations.
-- Real-time Alerts: Provides live feedback during scans with the option to export results in CSV or JSON format for further analysis.
-- Optional Web Interface: For users preferring a graphical interface, we offer a lightweight web app built with Flask, allowing remote scans and report viewing.
+## Features
 
-## How It Works
-- Initiating the Scan: Users can input an IP address, and the tool will begin scanning for open TCP ports across a predefined or customizable range.
-- Processing Results: The tool uses efficient algorithms to scan each port and determine if a service is exposed. We fine-tuned the algorithms to balance speed and accuracy, ensuring minimal false positives or negatives.
-- Final Report: Once the scan completes, a report is generated showing open ports, associated services, and suggested next steps for securing exposed services.
+- **Multi-threaded scanning** — configurable thread pool (default 200) for fast parallel scans
+- **Banner grabbing** — attempts to capture service banners from open ports
+- **Security recommendations** — per-service security advice for every open port
+- **CSV & JSON export** — export results for further analysis or record-keeping
+- **Real-time CLI feedback** — live progress bar + open port alerts as they're found
+- **Flask web interface** — browser-based GUI with live progress, results table, and export buttons
 
-## Takeaways
-This project provided valuable insights into network security practices, multi-threaded application design, and backend development. Additionally, working with Flask for the web interface taught me how to connect backend processes with real-time web applications seamlessly.
+---
+
+## Installation
+
+```bash
+git clone https://github.com/yourname/netport-scanner.git
+cd netport-scanner
+pip install -r requirements.txt
+```
+
+---
+
+## Usage
+
+### CLI
+
+```bash
+# Basic scan (ports 1–1024)
+python cli.py 192.168.1.1
+
+# Custom range
+python cli.py scanme.nmap.org --range 1-10000
+
+# Export results
+python cli.py example.com --export both --output my_scan
+
+# Full options
+python cli.py <host> --range 1-65535 --threads 300 --timeout 0.8 --export json
+```
+
+**CLI Options:**
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--range` | `1-1024` | Port range (`start-end`) |
+| `--threads` | `200` | Concurrent threads |
+| `--timeout` | `1.0` | TCP timeout in seconds |
+| `--export` | _(none)_ | `json`, `csv`, or `both` |
+| `--output` | `scan_results` | Output filename (no extension) |
+
+---
+
+### Web Interface
+
+```bash
+python app.py
+# Open http://localhost:5000
+```
+
+The web UI lets you configure and run scans from a browser, watch live progress, and download reports.
+
+---
+
+## Project Structure
+
+```
+netport-scanner/
+├── scanner.py          # Core scanning engine (port scan, export logic)
+├── cli.py              # Command-line interface
+├── app.py              # Flask web application
+├── templates/
+│   └── index.html      # Web UI
+├── reports/            # Auto-created; stores exported reports
+└── requirements.txt
+```
+
+---
+
+## ⚠️ Legal Notice
+
+Only scan hosts you own or have explicit written permission to test. Unauthorized port scanning may be illegal in your jurisdiction.
+
+---
+
+## License
+
+MIT

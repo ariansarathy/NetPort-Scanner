@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NetPort Scanner</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --green: #3fb950;
+      --red: #f85149;
+      --yellow: #d29922;
+      --cyan: #58a6ff;
+      --purple: #bc8cff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, monospace; min-height: 100vh; }
+
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 2rem;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    header .logo { font-size: 1.4rem; font-weight: 700; color: var(--cyan); letter-spacing: 1px; }
+    header .subtitle { color: var(--muted); font-size: 0.85rem; }
+
+    .container { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .card h2 { font-size: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1.2rem; }
+
+    .form-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .form-group { display: flex; flex-direction: column; gap: .4rem; flex: 1; min-width: 160px; }
+    label { font-size: .8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    input {
+      background: var(--bg); border: 1px solid var(--border); color: var(--text);
+      border-radius: 6px; padding: .6rem .8rem; font-size: .95rem;
+      transition: border-color .2s;
+    }
+    input:focus { outline: none; border-color: var(--cyan); }
+
+    .btn {
+      padding: .7rem 1.8rem; border: none; border-radius: 6px;
+      font-size: .95rem; font-weight: 600; cursor: pointer; transition: all .2s;
+    }
+    .btn-primary { background: var(--cyan); color: #000; }
+    .btn-primary:hover { background: #79c0ff; }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-sm { padding: .4rem 1rem; font-size: .82rem; }
+    .btn-green  { background: var(--green); color: #000; }
+    .btn-yellow { background: var(--yellow); color: #000; }
+
+    /* Progress */
+    .progress-wrap { display: none; }
+    .progress-bar-track {
+      background: var(--border); border-radius: 99px; height: 8px; overflow: hidden; margin: .8rem 0;
+    }
+    .progress-bar-fill {
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      height: 100%; width: 0%; transition: width .3s ease; border-radius: 99px;
+    }
+    .progress-label { font-size: .85rem; color: var(--muted); }
+
+    /* Live feed */
+    #live-feed {
+      background: #010409; border: 1px solid var(--border);
+      border-radius: 6px; padding: 1rem; font-family: monospace; font-size: .85rem;
+      max-height: 200px; overflow-y: auto; display: none; margin-top: 1rem;
+    }
+    .feed-item { color: var(--green); padding: 1px 0; }
+    .feed-item span { color: var(--muted); }
+
+    /* Results table */
+    #results-section { display: none; }
+    .results-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: .8rem;
+    }
+    .stat-row { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat .val { font-size: 1.6rem; font-weight: 700; color: var(--cyan); }
+    .stat .lbl { font-size: .75rem; color: var(--muted); text-transform: uppercase; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th { text-align: left; padding: .6rem .8rem; color: var(--muted); font-size: .78rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+    td { padding: .7rem .8rem; border-bottom: 1px solid #1c2128; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #1c2128; }
+
+    .badge {
+      display: inline-block; padding: .2rem .6rem; border-radius: 99px;
+      font-size: .75rem; font-weight: 600;
+    }
+    .badge-open { background: #1a3a1a; color: var(--green); border: 1px solid var(--green); }
+    .port-num { color: var(--cyan); font-weight: 700; font-family: monospace; }
+    .svc-name { color: var(--purple); }
+    .rec { font-size: .82rem; color: var(--muted); }
+    .banner-txt { font-size: .78rem; color: var(--yellow); font-family: monospace; margin-top: .3rem; word-break: break-all; }
+
+    .empty-state { text-align: center; padding: 2.5rem; color: var(--muted); }
+    .export-btns { display: flex; gap: .6rem; }
+
+    .alert { padding: .8rem 1rem; border-radius: 6px; font-size: .9rem; margin-bottom: 1rem; }
+    .alert-error { background: #2d1414; border: 1px solid var(--red); color: var(--red); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">🔍 NetPort Scanner</div>
+    <div class="subtitle">TCP Port Scanner &amp; Security Analyzer</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Scan Form -->
+  <div class="card">
+    <h2>New Scan</h2>
+    <div id="error-box" class="alert alert-error" style="display:none;"></div>
+    <div class="form-row" style="margin-bottom:1rem;">
+      <div class="form-group" style="flex:3; min-width:220px;">
+        <label>Target Host / IP</label>
+        <input id="inp-host" type="text" placeholder="e.g. 192.168.1.1 or example.com" />
+      </div>
+      <div class="form-group">
+        <label>Port Range</label>
+        <input id="inp-range" type="text" value="1-1024" placeholder="1-1024" />
+      </div>
+      <div class="form-group">
+        <label>Threads</label>
+        <input id="inp-threads" type="number" value="200" min="10" max="500" />
+      </div>
+      <div class="form-group">
+        <label>Timeout (s)</label>
+        <input id="inp-timeout" type="number" value="1.0" min="0.1" max="5" step="0.1" />
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btn-scan" onclick="startScan()">▶ Start Scan</button>
+  </div>
+
+  <!-- Progress -->
+  <div class="card progress-wrap" id="progress-card">
+    <h2>Scanning <span id="prog-host" style="color:var(--cyan)"></span></h2>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="prog-bar"></div></div>
+    <div class="progress-label" id="prog-label">Initializing…</div>
+    <div id="live-feed"></div>
+  </div>
+
+  <!-- Results -->
+  <div id="results-section">
+    <div class="card">
+      <div class="results-header">
+        <div>
+          <div style="font-size:1.1rem; font-weight:700; margin-bottom:.3rem;">
+            Scan Results — <span id="res-host" style="color:var(--cyan)"></span>
+          </div>
+          <div style="font-size:.82rem; color:var(--muted);" id="res-meta"></div>
+        </div>
+        <div class="stat-row">
+          <div class="stat"><div class="val" id="res-open">0</div><div class="lbl">Open</div></div>
+          <div class="stat"><div class="val" id="res-total">0</div><div class="lbl">Scanned</div></div>
+          <div class="stat"><div class="val" id="res-dur">0s</div><div class="lbl">Duration</div></div>
+        </div>
+      </div>
+
+      <div class="export-btns" id="export-btns" style="margin-bottom:1rem; display:none;">
+        <button class="btn btn-green btn-sm" id="btn-json">⬇ JSON</button>
+        <button class="btn btn-yellow btn-sm" id="btn-csv">⬇ CSV</button>
+      </div>
+
+      <div id="results-body"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let pollInterval = null;
+  let currentJobId = null;
+
+  function showError(msg) {
+    const box = document.getElementById('error-box');
+    box.textContent = msg;
+    box.style.display = 'block';
+  }
+  function hideError() {
+    document.getElementById('error-box').style.display = 'none';
+  }
+
+  async function startScan() {
+    hideError();
+    const host    = document.getElementById('inp-host').value.trim();
+    const range   = document.getElementById('inp-range').value.trim();
+    const threads = parseInt(document.getElementById('inp-threads').value);
+    const timeout = parseFloat(document.getElementById('inp-timeout').value);
+
+    if (!host) { showError('Please enter a target host.'); return; }
+
+    document.getElementById('btn-scan').disabled = true;
+    document.getElementById('results-section').style.display = 'none';
+
+    const progCard = document.getElementById('progress-card');
+    progCard.style.display = 'block';
+    document.getElementById('prog-host').textContent = host;
+    document.getElementById('prog-bar').style.width = '0%';
+    document.getElementById('prog-label').textContent = 'Starting…';
+    document.getElementById('live-feed').innerHTML = '';
+    document.getElementById('live-feed').style.display = 'block';
+
+    try {
+      const res = await fetch('/api/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ host, range, threads, timeout }),
+      });
+      const data = await res.json();
+      if (data.error) { showError(data.error); resetUI(); return; }
+
+      currentJobId = data.job_id;
+      pollInterval = setInterval(pollStatus, 800);
+    } catch(e) {
+      showError('Failed to start scan: ' + e.message);
+      resetUI();
+    }
+  }
+
+  async function pollStatus() {
+    try {
+      const res = await fetch(`/api/status/${currentJobId}`);
+      const data = await res.json();
+
+      // Update progress bar
+      document.getElementById('prog-bar').style.width = data.progress + '%';
+      document.getElementById('prog-label').textContent =
+        `${data.progress}% — ${data.scanned} / ${data.total} ports scanned`;
+
+      // Live feed
+      const feed = document.getElementById('live-feed');
+      feed.innerHTML = '';
+      const shown = data.open_ports_live.slice(-12);
+      shown.forEach(p => {
+        const el = document.createElement('div');
+        el.className = 'feed-item';
+        el.innerHTML = `● Port <strong>${p.port}</strong> <span>→ ${p.service}</span>`;
+        feed.appendChild(el);
+      });
+      feed.scrollTop = feed.scrollHeight;
+
+      if (data.status === 'complete') {
+        clearInterval(pollInterval);
+        renderResults(data.results);
+      } else if (data.status === 'error') {
+        clearInterval(pollInterval);
+        showError(data.error || 'An unknown error occurred.');
+        resetUI();
+      }
+    } catch(e) {
+      clearInterval(pollInterval);
+      showError('Lost connection to server.');
+      resetUI();
+    }
+  }
+
+  function renderResults(r) {
+    document.getElementById('progress-card').style.display = 'none';
+    document.getElementById('results-section').style.display = 'block';
+    document.getElementById('res-host').textContent = `${r.host} (${r.ip})`;
+    document.getElementById('res-meta').textContent =
+      `Range: ${r.scan_range}  •  Started: ${new Date(r.scan_started).toLocaleString()}`;
+    document.getElementById('res-open').textContent  = r.open_count;
+    document.getElementById('res-total').textContent = r.total_ports_scanned;
+    document.getElementById('res-dur').textContent   = r.duration_seconds + 's';
+
+    const exportBtns = document.getElementById('export-btns');
+    exportBtns.style.display = r.open_count > 0 ? 'flex' : 'none';
+    document.getElementById('btn-json').onclick = () => window.location = `/api/export/${currentJobId}/json`;
+    document.getElementById('btn-csv').onclick  = () => window.location = `/api/export/${currentJobId}/csv`;
+
+    const body = document.getElementById('results-body');
+    if (r.open_count === 0) {
+      body.innerHTML = '<div class="empty-state">🔒 No open ports found in the scanned range.</div>';
+    } else {
+      body.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Port</th><th>Service</th><th>Status</th><th>Security Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${r.open_ports.map(p => `
+              <tr>
+                <td class="port-num">${p.port}</td>
+                <td class="svc-name">${p.service}</td>
+                <td><span class="badge badge-open">OPEN</span></td>
+                <td>
+                  <div class="rec">${p.recommendation}</div>
+                  ${p.banner ? `<div class="banner-txt">↳ ${escHtml(p.banner.substring(0,120))}</div>` : ''}
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+
+    resetUI();
+  }
+
+  function resetUI() {
+    document.getElementById('btn-scan').disabled = false;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
+</body>
+</html>
