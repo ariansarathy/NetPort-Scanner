@@ -1,17 +1,1 @@
-#Testing Python 
-__pycache__/
-*.pyc
-*.pyo
 
-# IDE
-.vscode
-.idea/
-
-# Test Environment 
-env/
-venv/
-
-# Test
-*.log
-
-pip.inl #testing delete if application doesn't run
